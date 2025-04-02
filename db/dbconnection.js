@@ -6,10 +6,18 @@ let Users = null;
 let Roles = null;
 
 export const dbConnection = async (databse, username, password) => {
+    //Live
     const sequelize = new Sequelize(databse, username, password, {
         host: 'dpg-cvmengi4d50c73fuf00g-a',
         dialect: 'postgres'
     });
+
+    //Test
+    // const sequelize = new Sequelize(databse, username, password, {
+    //     host: 'localhost',
+    //     dialect: 'postgres'
+    // });
+
     try {
         await sequelize.authenticate();
         Users = await createUserModel(sequelize);

@@ -5,6 +5,14 @@ import router from './route/routes.js';
 
 
 const app = express();
+//Test
+// const port = "5000";
+// const database = "gariChaiDb";
+// const username = "postgres";
+// const password = "Ssle@1234";
+
+
+//live 
 const port = "5432";
 const database = "garichaidb";
 const username = "garichaidb";

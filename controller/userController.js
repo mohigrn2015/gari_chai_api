@@ -1,4 +1,4 @@
-import { Users,Roles } from "../db/dbconnection.js";
+import { Users, Roles } from "../db/dbconnection.js";
 import bcryptjs from "bcryptjs";
 import LoginModel from "../model/LoginModel.js";
 import refreshTokenUpdateModel from "../model/refreshTokenUpdateModel.js";
@@ -58,7 +58,15 @@ export const userLogin = async (req, res) => {
         loginData.validate();
 
         // Process login logic (assuming you fetch user from DB)
-        const isUserExist = await Users.findOne({ where: { username: loginData.username } });
+        const isUserExist = await Users.findOne({
+            where: { username: loginData.username }, 
+            include: [
+                {
+                    model: Roles,
+                    attributes: ["rolename"], // Fetch only rolename
+                },
+            ],
+        });
         if (!isUserExist) {
             return res.status(400).json({
                 result: false,
@@ -91,7 +99,8 @@ export const userLogin = async (req, res) => {
             message: "User is valid!",
             data: {
                 access_token: acctoken,
-                refresh_token: reftoken
+                refresh_token: reftoken,
+                rolename: isUserExist.tbl_role ? isUserExist.tbl_role.rolename : null
             }
         });
 
@@ -162,9 +171,9 @@ export const checkUser = async (req, res) => {
     try {
         const checkUser = new userCheckModel(req.body);
         checkUser.validate();
-        
-        console.log("req.body: ",req.body);
-        console.log("Roles: ",Roles);
+
+        console.log("req.body: ", req.body);
+        console.log("Roles: ", Roles);
         const user = await Users.findOne({
             where: { username: checkUser.username },
             include: [
@@ -195,28 +204,50 @@ export const checkUser = async (req, res) => {
     }
 };
 
-// export const checkUser = async (req, res) => {
-//     try {
-//         const user = new userCheckModel(req.body);
-//         user.validate();
+export const getUserInfo = async (req, res) => {
+    try {
+        const checkUser = new userCheckModel(req.body);
+        checkUser.validate();
 
-//         const isUserExist = await Users.findOne({ where: { username: user.username } });
+        console.log("req.body: ", req.body);
+        console.log("Roles: ", Roles);
+        const user = await Users.findOne({
+            where: { username: checkUser.username },
+            include: [
+                {
+                    model: Roles,
+                    attributes: ["rolename"], // Fetch only rolename
+                },
+            ],
+        });
 
-//         if (isUserExist) {
-//             return res.status(200).json({
-//                 result: true,
-//                 message: "User is already exist. Please login now!"
-//             });
-//         } else {
-//             return res.status(200).json({
-//                 result: false,
-//                 message: "User is not exist"
-//             });
-//         }
-//     } catch (error) {
-//         return res.status(500).json({
-//             result: false,
-//             message: `error during refresh token update: ${error}`
-//         });
-//     }
-// }
+        if (user) {
+            return res.status(200).json({
+                result: true,
+                message: "User already exists.",
+                data:{
+                    username: user.username,
+                    rolename: user.tbl_role ? user.tbl_role.rolename : null,
+                    personname:user.personname,
+                    mobilenumber:user.mobilenumber,
+                    nidnumber:user.nidnumber,
+                    email: user.email,
+                    drivinglisence:user.drivinglisence,
+                    address:user.address,
+                    createDate:user.createdAt
+                }
+                
+            });
+        } else {
+            return res.status(200).json({
+                result: false,
+                message: "User does not exist"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            result: false,
+            message: `Error during user check: ${error.message}`
+        });
+    }
+};

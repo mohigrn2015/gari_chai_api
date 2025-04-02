@@ -5,10 +5,10 @@ import router from './route/routes.js';
 
 
 const app = express();
-const port = "5000";
-const database = "gariChaiDb";
-const username = "postgres";
-const password = "Ssle@1234";
+const port = "5432";
+const database = "garichaidb";
+const username = "garichaidb";
+const password = "CU9OQwbkh9MO8nZYTt3JFGXGteDV69bA";
 
 app.use(express.json());
 app.use(cookieParser());

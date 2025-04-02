@@ -7,7 +7,7 @@ let Roles = null;
 
 export const dbConnection = async (databse, username, password) => {
     const sequelize = new Sequelize(databse, username, password, {
-        host: 'localhost',
+        host: 'dpg-cvmengi4d50c73fuf00g-a',
         dialect: 'postgres'
     });
     try {
